@@ -202,15 +202,42 @@ export default function ShiftDetailsPage() {
   accept="image/*"
   className="hidden"
   id={proofInputId}
-  onChange={(e) => {
-    const file = e.target.files?.[0];
+onChange={(e) => {
+  const file = e.target.files?.[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    alert(`Фото "${file.name}" выбрано`);
-  }}
+  const imageUrl = URL.createObjectURL(file);
+
+  alert(`Фото "${file.name}" выбрано`);
+
+  console.log("Фото:", imageUrl);
+  const preview = document.getElementById(
+  `preview-${task.id}`
+) as HTMLImageElement | null;
+
+if (preview) {
+  preview.src = imageUrl;
+  preview.classList.remove("hidden");
+}
+}}
 />
-
+{!completed && (
+  <button
+    type="button"
+    onClick={() => {
+      document.getElementById(proofInputId)?.click();
+    }}
+    className="mr-3 rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+  >
+    📸 Добавить подтверждение
+  </button>
+)}
+<img
+  id={`preview-${task.id}`}
+  className="mt-4 hidden max-h-64 rounded-xl border border-gray-200 object-contain"
+  alt="Подтверждение"
+/>
                     <div className="mt-5">
                       {completed ? (
                         <div className="inline-block rounded-xl bg-green-100 px-4 py-2 text-sm font-medium text-green-700">
@@ -219,6 +246,14 @@ export default function ShiftDetailsPage() {
                       ) : (
                         <button
                           onClick={() => {
+                            const preview = document.getElementById(
+  `preview-${task.id}`
+) as HTMLImageElement | null;
+
+if (!preview || preview.classList.contains("hidden")) {
+  alert("Сначала добавьте фото-подтверждение");
+  return;
+}
   const updatedCompletedTasks = [
     ...shift.completedTasks,
     task.id,
